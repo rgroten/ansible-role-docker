@@ -1,6 +1,8 @@
 ansible-role-docker
 =========
 
+[![Build Status](https://travis-ci.org/rgroten/ansible-role-docker.svg?branch=master)](https://travis-ci.org/rgroten/ansible-role-docker)
+
 This role will install/configure Docker on a CentOS7/RH7 server
 
 Requirements
