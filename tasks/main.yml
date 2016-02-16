@@ -1,0 +1,41 @@
+---
+- name: Add docker-engine yum repo
+  template: src=docker.repo.j2 dest=/etc/yum.repos.d/docker.repo
+  become: yes
+
+- name: Change docker repo from RHEL to CentOS
+  replace:
+    dest: /etc/yum.repos.d/docker.repo
+    regexp: 'RedHat'
+    replace: 'centos'
+  when: "{{ ansible_distribution == 'RedHat' }}"
+  become: yes
+
+- name: Install docker-engine and pip
+  yum: name="{{item}}" state=installed
+  with_items:
+    - docker-engine
+    - python-pip
+  become: yes
+
+- name: Ensure docker-py is installed
+  pip: name=docker-py                  
+  become: yes
+
+- name: Start/enable docker service
+  service: name=docker enabled=yes state=started
+  become: yes
+
+- name: Create docker group and add ansible user to it
+  user: 
+    name: "{{ ansible_user_id }}"
+    groups: docker
+  become: yes
+  register: add_group
+
+# Hacky workaround until ansible implements session flush
+# Only needed if running another role within the same playbook
+- name:  Reload user groups after group change
+  command: "pkill -u {{ ansible_user_id }} sshd"
+  when: add_group|changed
+  ignore_errors: yes
