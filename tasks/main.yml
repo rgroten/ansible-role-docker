@@ -21,15 +21,5 @@
 - name: Start/enable docker service
   service: name=docker enabled=yes state=started
 
-- name: Create docker group and add ansible user to it
-  user: 
-    name: "{{ ansible_user_id }}"
-    groups: docker
-  register: add_group
-
-# Hacky workaround until ansible implements session flush
-# Only needed if running another role within the same playbook
-- name:  Reload user groups after group change
-  command: "pkill -u {{ ansible_user_id }} sshd"
-  when: add_group|changed
-  ignore_errors: yes
+- name: Create docker user
+  user: name=docker group=docker uid=991
