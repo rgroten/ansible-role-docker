@@ -14,6 +14,7 @@ Example Playbook
 ----------------
 
     - hosts: docker-servers
+      become: yes
       roles:
          - { role: rgroten.docker }
 
